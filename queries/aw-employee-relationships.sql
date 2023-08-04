@@ -1,0 +1,18 @@
+SELECT
+*
+FROM [HumanResources].[Employee] [employee]
+LEFT JOIN [HumanResources].[EmployeeDepartmentHistory] [deptHistory]
+ON [employee].[BusinessEntityID] = [deptHistory].[BusinessEntityID]
+LEFT JOIN [HumanResources].[Department] [department]
+ON [deptHistory].[DepartmentID] = [department].[DepartmentID]
+LEFT JOIN [HumanResources].[EmployeePayHistory] [pay]
+ON [employee].[BusinessEntityID] = [pay].[BusinessEntityID]
+LEFT JOIN [HumanResources].[JobCandidate] [candidate]
+ON [employee].[BusinessEntityID] = [candidate].[BusinessEntityID]
+LEFT JOIN [Person].[Person] [person]
+ON [employee].[BusinessEntityID] = [person].[BusinessEntityID]
+LEFT JOIN [Sales].[SalesPerson] [sales]
+ON [employee].[BusinessEntityID] = [sales].[BusinessEntityID]
+LEFT JOIN [Purchasing].[PurchaseOrderHeader] [po]
+ON [employee].[BusinessEntityID] = [po].[EmployeeID]
+ORDER BY [employee].[LoginID]

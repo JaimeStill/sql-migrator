@@ -1,0 +1,67 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "app-db-drop",
+            "command": "dotnet",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceFolder}/src/App"
+            },
+            "args": [
+                "ef",
+                "database",
+                "drop",
+                "-f"
+            ]
+        },
+        {
+            "label": "app-db-update",
+            "command": "dotnet",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceFolder}/src/App"
+            },
+            "args": [
+                "ef",
+                "database",
+                "update"
+            ]
+        },
+        {
+            "label": "build",
+            "command": "dotnet",
+            "type": "shell",
+            "args": [
+                "build"
+            ]
+        },
+        {
+            "label": "migration-db-drop",
+            "command": "dotnet",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceFolder}/src/Core"
+            },
+            "args": [
+                "ef",
+                "database",
+                "drop",
+                "-f"
+            ]
+        },
+        {
+            "label": "migration-db-update",
+            "command": "dotnet",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceFolder}/src/Core"
+            },
+            "args": [
+                "ef",
+                "database",
+                "update"
+            ]
+        }
+    ]
+}

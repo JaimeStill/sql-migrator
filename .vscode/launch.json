@@ -1,0 +1,53 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "migrate contact info",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "cwd": "${workspaceFolder}/src/Cli",
+            "program": "bin/Debug/net7.0/migrator.dll",
+            "args": [
+                "migrate",
+                "contactinfo"
+            ]
+        },
+        {
+            "name": "migrate department",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "cwd": "${workspaceFolder}/src/Cli",
+            "program": "bin/Debug/net7.0/migrator.dll",
+            "args": [
+                "migrate",
+                "department"
+            ]
+        },
+        {
+            "name": "migrate employee",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "cwd": "${workspaceFolder}/src/Cli",
+            "program": "bin/Debug/net7.0/migrator.dll",
+            "args": [
+                "migrate",
+                "employee"
+            ]
+        },
+        {
+            "name": "migrate full",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "cwd": "${workspaceFolder}/src/Cli",
+            "program": "bin/Debug/net7.0/migrator.dll",
+            "args": [
+                "migrate",
+                "full"
+            ]
+        }
+    ]
+}
