@@ -1,6 +1,6 @@
 # SQL Migrator
 
-> Work In Progress
+https://github.com/JaimeStill/sql-migrator/assets/14102723/cd75c6bc-885f-47c8-9b6e-3d83c027e8cd
 
 When designing the next generation of an application, the evolved schema of the new application does not always easily conform to the schema of the original application. This is particularly true when:
 
