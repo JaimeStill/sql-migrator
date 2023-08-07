@@ -56,7 +56,7 @@ ORDER BY [employee].[LoginID]
 
 From this, I determined that I wanted to capture the current `[HumanResources].[Department]` the `Employee` currently belongs to as well.
 
-## Schema Design
+## Identification
 
 In order to isolate the final properties for my schema models, I built queries that translated the AdventureWorks data into the format that I wanted. In addition to these properties, I also specified `Source*` properties that would be used to facilitate data migration from AdventureWorks into my own database.
 
