@@ -129,27 +129,11 @@ The above query merges the data from `[Person.PersonPhone]`, `[Person].[PhoneNum
 
 ## Implementation
 
-To prepare the project for building out the data migration infrastructure, I initialized the following projects:
+To prepare the project for building out the data migration infrastructure, I initialized the [**App**](https://github.com/JaimeStill/sql-migrator/tree/main/src/App) project with `dotnet new webapi`. It serves as an API for the app schema and contains the Entity Framework configuration. It has the following structure:
 
-### [App](https://github.com/JaimeStill/sql-migrator/tree/main/src/App)
-
-Built with `dotnet new webapi` to serve as an API for the app schema and contains the Entity Framework configuration. It has the following structure:
-
-* [Schema](https://github.com/JaimeStill/sql-migrator/tree/main/src/App/Schema) - class definitions for Entity Framework models.
-* [Data](https://github.com/JaimeStill/sql-migrator/tree/main/src/App/Data) - contains the Entity Framework `AppDbContext`.
+* [Schema](https://github.com/JaimeStill/sql-migrator/tree/main/src/App/Schema) - class definitions for entity models.
+* [Data](https://github.com/JaimeStill/sql-migrator/tree/main/src/App/Data) - contains the `AppDbContext` Entity Framework [`DbContext`](https://learn.microsoft.com/en-us/ef/core/dbcontext-configuration/).
     * [Config](https://github.com/JaimeStill/sql-migrator/tree/main/src/App/Data/Config) - contains [`IEntityTypeConfiguration`](https://learn.microsoft.com/en-us/ef/core/modeling/#grouping-configuration) entity configurations.
-* [Migrations](https://github.com/JaimeStill/sql-migrator/tree/main/src/App/Migrations) - contains the Entity Framework schema migrations.
+* [Migrations](https://github.com/JaimeStill/sql-migrator/tree/main/src/App/Migrations) - contains the Entity Framework migrations.
 * [Services](https://github.com/JaimeStill/sql-migrator/tree/main/src/App/Services) - contains classes that define entity service logic and a class for registering the services with the [ASP.NET Core Dependency Injection](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/dependency-injection) service container.
 * [Controllers](https://github.com/JaimeStill/sql-migrator/tree/main/src/App/Controllers) - contains API controllers that expose entity logic.
-
-### [Core](https://github.com/JaimeStill/sql-migrator/tree/main/src/Core)
-
-Built with `dotnet new console` to facilitate defining the core migration infrastructure and migration database schema.  It is setup as a [Hosted Console App](https://learn.microsoft.com/en-us/dotnet/core/extensions/generic-host) to facilitate Entity Framework migration management. It has the following structure:
-
-### [Cli](https://github.com/JaimeStill/sql-migrator/tree/main/src/Cli)
-
-
-
-It has the following structure:
-
-

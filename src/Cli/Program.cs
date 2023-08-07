@@ -5,6 +5,7 @@ await new CliApp(
     "V2 Data Migrator",
     new()
     {
-        new MigrateCommand()
+        new MigrateCommand(),
+        new TestCommand()
     }
 ).InvokeAsync(args);
