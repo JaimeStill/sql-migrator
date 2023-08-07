@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations.Schema;
+using App.Models;
 
 namespace App.Schema;
 
@@ -9,4 +10,17 @@ public class Department : Entity
     public string Section { get; set; } = string.Empty;
 
     public ICollection<Employee> Employees { get; } = new List<Employee>();
+
+    public override Task<ValidationResult> Validate()
+    {
+        ValidationResult result = new();
+
+        if (string.IsNullOrWhiteSpace(Name))
+            result.AddMessage("Department must have a Name");
+
+        if (string.IsNullOrWhiteSpace(Section))
+            result.AddMessage("Department must have a Section");
+
+        return Task.FromResult(result);
+    }
 }

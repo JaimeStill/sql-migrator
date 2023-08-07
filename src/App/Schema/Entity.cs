@@ -1,3 +1,5 @@
+using App.Models;
+
 namespace App.Schema;
 public abstract class Entity
 {
@@ -8,4 +10,6 @@ public abstract class Entity
     {
         Type = GetType().FullName ?? "Entity";
     }
+
+    public abstract Task<ValidationResult> Validate();
 }
