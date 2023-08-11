@@ -2,6 +2,18 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "migrate company",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "cwd": "${workspaceFolder}/src/Cli",
+            "program": "bin/Debug/net7.0/migrator.dll",
+            "args": [
+                "migrate",
+                "company"
+            ]
+        },
+        {
             "name": "migrate contact info",
             "type": "coreclr",
             "request": "launch",

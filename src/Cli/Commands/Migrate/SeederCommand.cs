@@ -2,11 +2,11 @@ using Core.Schema;
 using Core.Sql;
 
 namespace Cli.Commands;
-public abstract class TranslatorCommand<T, E> : CliCommand
-where T : Translator<E>
+public abstract class SeederCommand<S, E> : CliCommand
+where S : Seeder<E>
 where E : IMigrationTarget
 {
-    public TranslatorCommand(
+    public SeederCommand(
         string description
     ) : base(
         typeof(E).Name.ToLower(),
@@ -15,7 +15,7 @@ where E : IMigrationTarget
     )
     { }
 
-    static async Task Call(string origin, string target, string migrator)
+    public static async Task Call(string origin, string target, string migrator)
     {
         ConsoleColor color = Console.ForegroundColor;
         string entity = typeof(E).Name;
@@ -23,16 +23,16 @@ where E : IMigrationTarget
         try
         {
             Console.ForegroundColor = ConsoleColor.Blue;
-            Console.WriteLine($"Migrating {entity} records...");
+            Console.WriteLine($"Seeding {entity} records...");
 
             Console.ForegroundColor = ConsoleColor.Gray;
-            T? translator = Activator.CreateInstance(typeof(T), new object[] { origin, target, migrator }) as T;
+            S? seeder = Activator.CreateInstance(typeof(S), new object[] { target, migrator }) as S;
 
-            if (translator is not null)
+            if (seeder is not null)
             {
-                List<E> records = await translator.Migrate();
+                List<E> records = await seeder.Migrate();
                 Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine($"{records.Count} {entity} records successfully migrated!");
+                Console.WriteLine($"{records.Count} {entity} records successfully seeded!");
             }
         }
         finally

@@ -5,7 +5,7 @@ namespace Cli.Commands;
 public class DepartmentCommand : TranslatorCommand<DepartmentTranslator, Department>
 {
     public DepartmentCommand() : base(
-        "Migrate Department from AdventureWorks to V2"
+        "Migrate Department from AdventureWorks to Target schema"
     )
     { }
 }

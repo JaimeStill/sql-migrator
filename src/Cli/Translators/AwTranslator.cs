@@ -3,7 +3,8 @@ using Core.Schema;
 using Core.Sql;
 
 namespace Cli.Translators;
-public abstract class AwTranslator<T> : Translator<T> where T : IMigrationTarget
+public abstract class AwTranslator<E> : Translator<E>
+where E : IMigrationTarget
 {
     protected static readonly string[] insertProps = {
         "Type"
@@ -13,7 +14,7 @@ public abstract class AwTranslator<T> : Translator<T> where T : IMigrationTarget
         string source = "Origin",
         string target = "Target",
         string migrator = "Migration"
-    ) : base(typeof(T).Name, source, target, migrator)
+    ) : base(source, target, migrator)
     { }
 
     protected abstract string[] RootCommands();
@@ -44,16 +45,16 @@ public abstract class AwTranslator<T> : Translator<T> where T : IMigrationTarget
         return query.ToString();
     }
 
-    protected async Task<List<T>> Get(string[] commands, string select = "SELECT") =>
-        await Config.Source.Query<T>(
+    protected async Task<List<E>> Get(string[] commands, string select = "SELECT") =>
+        await Config.Source.Query<E>(
             GetQuery(commands, select)
         );
 
-    protected async Task<T?> GetByKey(string[] commands)
+    protected async Task<E?> GetByKey(string[] commands)
     {
         string query = GetQuery(commands, "SELECT TOP(1)");
 
-        return await Config.Source.QueryFirstOrDefault<T>(
+        return await Config.Source.QueryFirstOrDefault<E>(
             query
         );
     }

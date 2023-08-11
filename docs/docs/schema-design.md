@@ -64,7 +64,7 @@ In order to isolate the final properties for my schema models, I built queries t
 
 ```sql title="department-schema.sql"
 SELECT DISTINCT
-    CAST([department].[DepartmentID] as nvarchar(MAX)) [SourceId],
+    CAST([department].[DepartmentID] as nvarchar(MAX)) [OriginKey],
     [department].[Name] [Name],
     [department].[GroupName] [GroupName]
 FROM [HumanResources].[Department] [department]
@@ -75,8 +75,8 @@ ORDER BY [department].[Name]
 
 ```sql title="employee-schema.sql"
 SELECT
-    CAST([person].[BusinessEntityID] as nvarchar(MAX)) [SourceId],
-    CAST([history].[DepartmentID] as nvarchar(MAX)) [SourceDepartmentId],
+    CAST([person].[BusinessEntityID] as nvarchar(MAX)) [OriginKey],
+    CAST([history].[DepartmentID] as nvarchar(MAX)) [OriginDepartmentKey],
     [employee].[NationalIdNumber] [NationalId],
     [person].[LastName] [LastName],
     [person].[FirstName] [FirstName],
@@ -103,7 +103,7 @@ In the above query, I wanted to filter the results so that I only get:
 ```sql title="contact-info-schema.sql"
 (
     SELECT
-        CAST([person].[BusinessEntityID] as nvarchar(MAX)) [SourceEmployeeId],
+        CAST([person].[BusinessEntityID] as nvarchar(MAX)) [OriginEmployeeKey],
         CAST([phone].[PhoneNumber] as nvarchar(MAX)) [Value],
         CAST([phoneType].[Name] as nvarchar(MAX)) [ContactType]
     FROM [Person].[Person] [person]
@@ -115,7 +115,7 @@ In the above query, I wanted to filter the results so that I only get:
 UNION
 (
     SELECT
-        CAST([person].[BusinessEntityID] as nvarchar(MAX)) [SourceEmployeeId],
+        CAST([person].[BusinessEntityID] as nvarchar(MAX)) [OriginEmployeeKey],
         CAST([email].[EmailAddress] as nvarchar(MAX)) [Value],
         CAST('Email' as nvarchar(MAX)) [ContactType]
     FROM [Person].[Person] [person]

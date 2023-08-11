@@ -1,3 +1,4 @@
+using Cli.Seeders;
 using Core.Schema.AdventureWorks;
 
 namespace Cli.Translators;
@@ -20,13 +21,19 @@ public class EmployeeTranslator : AwTranslator<Employee>
 
     protected override Func<Employee, Task<Employee>>? OnMigrate => async (Employee employee) =>
     {
-        employee.DepartmentId = await departmentTranslator.EnsureMigrated(employee.SourceDepartmentId);
+        employee.DepartmentId = await departmentTranslator.EnsureMigrated(employee.OriginDepartmentKey);
         return employee;
     };
 
+    protected override Func<Employee, Task>? AfterMigrate => async (Employee record) =>
+    {
+        MessageSeeder seeder = new(record, Config.TargetKey, Config.MigratorKey);
+        await seeder.Migrate();
+    };
+
     protected override string[] GetProps() => new string[] {
-        "CAST([person].[BusinessEntityID] as nvarchar(MAX)) [SourceId],",
-        "CAST([history].[DepartmentID] as nvarchar(MAX)) [SourceDepartmentId],",
+        "CAST([person].[BusinessEntityID] as nvarchar(MAX)) [OriginKey],",
+        "CAST([history].[DepartmentID] as nvarchar(MAX)) [OriginDepartmentKey],",
         "[employee].[NationalIdNumber] [NationalId],",
         "[person].[LastName] [LastName],",
         "[person].[FirstName] [FirstName],",
@@ -59,8 +66,8 @@ public class EmployeeTranslator : AwTranslator<Employee>
 
     protected override Employee ToV1Null() => new()
     {
-        SourceId = "V1Null",
-        SourceDepartmentId = "V1Null",
+        OriginKey = "V1Null",
+        OriginDepartmentKey = "V1Null",
         LastName = "V1Null"
     };
 

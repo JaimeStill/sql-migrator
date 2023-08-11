@@ -1,6 +1,6 @@
 SELECT
-    CAST([person].[BusinessEntityID] as nvarchar(MAX)) [SourceId],
-    CAST([history].[DepartmentID] as nvarchar(MAX)) [SourceDepartmentId],
+    CAST([person].[BusinessEntityID] as nvarchar(MAX)) [OriginKey],
+    CAST([history].[DepartmentID] as nvarchar(MAX)) [OriginDepartmentKey],
     [employee].[NationalIdNumber] [NationalId],
     [person].[LastName] [LastName],
     [person].[FirstName] [FirstName],

@@ -152,7 +152,7 @@ await new CliApp(
 
 The `migrate` sub-command is defined as [`MigrateCommand`](https://github.com/JaimeStill/sql-migrator/blob/main/src/Cli/Commands/Migrate/MigrateCommand.cs) and is a container for all of the migration sub-commands.
 
-A `migrate` sub-command maps to one or more `Translator` objects. It passes in the provided `--v1`, `--v2`, and `--migrator` arguments to the `Translator` constructor and executes the `Translator.Migrate()` method.
+A `migrate` sub-command maps to one or more `Translator` objects. It passes in the provided `--origin`, `--target`, and `--migrator` arguments to the `Translator` constructor and executes the `Translator.Migrate()` method.
 
 It will end up looking like this once all of the commands are built:
 
@@ -168,13 +168,13 @@ public class MigrateCommand : CliCommand
         options: new()
         {
             new Option<string>(
-                new string[] { "--v1" },
-                description: "v1 server and database object in connections.json",
+                new string[] { "--origin" },
+                description: "origin server and database object in connections.json",
                 getDefaultValue: () => "Origin"
             ),
             new Option<string>(
-                new string[] { "--v2" },
-                description: "v2 server and database object in connections.json",
+                new string[] { "--target" },
+                description: "target server and database object in connections.json",
                 getDefaultValue: () => "Target"
             ),
             new Option<string>(
@@ -185,6 +185,7 @@ public class MigrateCommand : CliCommand
         },
         commands: new()
         {
+            new CompanyCommand(),
             new ContactInfoCommand(),
             new DepartmentCommand(),
             new EmployeeCommand(),
@@ -313,7 +314,7 @@ public class DepartmentTranslator : AwTranslator<Department>
     { }
 
     protected override string[] GetProps() => new string[] {
-        "CAST([department].[DepartmentID] as nvarchar(MAX)) [SourceId],",
+        "CAST([department].[DepartmentID] as nvarchar(MAX)) [OriginKey],",
         "[department].[Name] [Name],",
         "[department].[GroupName] [Section]"
     };
@@ -330,7 +331,7 @@ public class DepartmentTranslator : AwTranslator<Department>
 
     protected override Department ToV1Null() => new()
     {
-        SourceId = "V1Null",
+        OriginKey = "V1Null",
         Name = "V1Null"
     };
 
@@ -399,13 +400,13 @@ public class EmployeeTranslator : AwTranslator<Employee>
 
     protected override Func<Employee, Task<Employee>>? OnMigrate => async (Employee employee) =>
     {
-        employee.DepartmentId = await departmentTranslator.EnsureMigrated(employee.SourceDepartmentId);
+        employee.DepartmentId = await departmentTranslator.EnsureMigrated(employee.OriginDepartmentKey);
         return employee;
     };
 
     protected override string[] GetProps() => new string[] {
-        "CAST([person].[BusinessEntityID] as nvarchar(MAX)) [SourceId],",
-        "CAST([history].[DepartmentID] as nvarchar(MAX)) [SourceDepartmentId],",
+        "CAST([person].[BusinessEntityID] as nvarchar(MAX)) [OriginKey],",
+        "CAST([history].[DepartmentID] as nvarchar(MAX)) [OriginDepartmentKey],",
         "[employee].[NationalIdNumber] [NationalId],",
         "[person].[LastName] [LastName],",
         "[person].[FirstName] [FirstName],",
@@ -438,8 +439,8 @@ public class EmployeeTranslator : AwTranslator<Employee>
 
     protected override Employee ToV1Null() => new()
     {
-        SourceId = "V1Null",
-        SourceDepartmentId = "V1Null",
+        OriginKey = "V1Null",
+        OriginDepartmentKey = "V1Null",
         LastName = "V1Null"
     };
 
@@ -488,7 +489,7 @@ Sometimes, translating from the origin schema to the target schema is more compl
 The [`ContactInfoTranslator`](https://github.com/JaimeStill/sql-migrator/blob/main/src/Cli/Translators/ContactInfoTranslator.cs) demonstrates such a complex migration. Particularly, notice:
 
 * The SQL schema query is actually two select queries whose results are merged through a `UNION`. `GetPhoneQuery()` and `GetEmailQuery()` are used to compose the full data retrieval query in the `Get` and `GetByKey` methods.
-* Because the source of `ContactInfo` could be either `Email` or `Phone`, the `SourceId` property specified by the [`ContactInfo`](https://github.com/JaimeStill/sql-migrator/blob/main/migration/Schemas/AdventureWorks/ContactInfo.cs) `IMigrationTarget` class is actually composed of thre different values: `{SourceEmployeeId}.{ContactType}.{Value}`. The `GetByKey` method splits out these values to dynamically generate its query.
+* Because the source of `ContactInfo` could be either `Email` or `Phone`, the `OriginKey` property specified by the [`ContactInfo`](https://github.com/JaimeStill/sql-migrator/blob/main/migration/Schemas/AdventureWorks/ContactInfo.cs) `IMigrationTarget` class is actually composed of thre different values: `{OriginEmployeeKey}.{ContactType}.{Value}`. The `GetByKey` method splits out these values to dynamically generate its query.
 
 ```cs title="ContactInfoTranslator.cs"
 using System.Text;
@@ -516,7 +517,7 @@ public class ContactInfoTranslator : Translator<ContactInfo>
 
     protected override Func<ContactInfo, Task<ContactInfo>>? OnMigrate => async (info) =>
     {
-        info.EmployeeId = await employeeTranslator.EnsureMigrated(info.SourceEmployeeId);
+        info.EmployeeId = await employeeTranslator.EnsureMigrated(info.OriginEmployeeKey);
         return info;
     };
 
@@ -529,14 +530,14 @@ public class ContactInfoTranslator : Translator<ContactInfo>
 
     protected override ContactInfo ToV1Null() => new()
     {
-        SourceEmployeeId = "V1Null",
+        OriginEmployeeKey = "V1Null",
         Value = "V1Null",
         ContactType = "V1Null"
     };
 
     protected static string[] GetPhoneQuery() => new string[] {
         "SELECT",
-        "  CAST([person].[BusinessEntityID] as nvarchar(MAX)) [SourceEmployeeId],",
+        "  CAST([person].[BusinessEntityID] as nvarchar(MAX)) [OriginEmployeeKey],",
         "  CAST([phone].[PhoneNumber] as nvarchar(MAX)) [Value],",
         "  CAST([phoneType].[Name] as nvarchar(MAX)) [ContactType]",
         "FROM [Person].[Person] [person]",
@@ -549,7 +550,7 @@ public class ContactInfoTranslator : Translator<ContactInfo>
 
     protected static string[] GetEmailQuery() => new string[] {
         "SELECT",
-        "  CAST([person].[BusinessEntityID] as nvarchar(MAX)) [SourceEmployeeId],",
+        "  CAST([person].[BusinessEntityID] as nvarchar(MAX)) [OriginEmployeeKey],",
         "  CAST([email].[EmailAddress] as nvarchar(MAX)) [Value],",
         "  CAST('Email' as nvarchar(MAX)) [ContactType]",
         "FROM [Person].[Person] [person]",

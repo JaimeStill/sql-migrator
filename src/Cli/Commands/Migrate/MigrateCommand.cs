@@ -9,13 +9,13 @@ public class MigrateCommand : CliCommand
         options: new()
         {
             new Option<string>(
-                new string[] { "--v1" },
-                description: "v1 server and database object in connections.json",
+                new string[] { "--origin" },
+                description: "origin server and database object in connections.json",
                 getDefaultValue: () => "Origin"
             ),
             new Option<string>(
-                new string[] { "--v2" },
-                description: "v2 server and database object in connections.json",
+                new string[] { "--target" },
+                description: "target server and database object in connections.json",
                 getDefaultValue: () => "Target"
             ),
             new Option<string>(
@@ -26,6 +26,7 @@ public class MigrateCommand : CliCommand
         },
         commands: new()
         {
+            new CompanyCommand(),
             new ContactInfoCommand(),
             new DepartmentCommand(),
             new EmployeeCommand(),

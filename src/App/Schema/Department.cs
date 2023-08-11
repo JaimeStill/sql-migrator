@@ -6,8 +6,11 @@ namespace App.Schema;
 [Table("Department")]
 public class Department : Entity
 {
+    public int CompanyId { get; set; }
     public string Name { get; set; } = string.Empty;
     public string Section { get; set; } = string.Empty;
+
+    public Company? Company { get; set; }
 
     public ICollection<Employee> Employees { get; } = new List<Employee>();
 

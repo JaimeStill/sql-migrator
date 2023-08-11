@@ -5,7 +5,7 @@ namespace Cli.Commands;
 public class ContactInfoCommand : TranslatorCommand<ContactInfoTranslator, ContactInfo>
 {
     public ContactInfoCommand() : base(
-        "Migrate Contact Info from AdventureWorks to V2"
+        "Migrate Contact Info from AdventureWorks to Target schema"
     )
     { }
 }

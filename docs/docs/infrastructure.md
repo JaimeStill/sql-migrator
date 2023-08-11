@@ -29,11 +29,11 @@ public interface IMigrationTarget
 {
     public int Id { get; }
     public string Type { get; }
-    public string SourceId { get; }
+    public string OriginKey { get; }
 }
 ```
 
-The [AdventureWorks](https://github.com/JaimeStill/sql-migrator/tree/main/src/Core/Schema/AdventureWorks) directory demonstrates this by providing sub-classes that implement `IMigrationTarget` for all of the [App/Schema](https://github.com/JaimeStill/sql-migrator/tree/main/src/App/Schema) entity models. In addition to the `SourceId`, these models should also specify maps to foreign key IDs in the origin schema. A good example of this is the [`ContactInfo`](https://github.com/JaimeStill/sql-migrator/blob/main/src/Core/Schema/AdventureWorks/ContactInfo.cs) model:
+The [AdventureWorks](https://github.com/JaimeStill/sql-migrator/tree/main/src/Core/Schema/AdventureWorks) directory demonstrates this by providing sub-classes that implement `IMigrationTarget` for all of the [App/Schema](https://github.com/JaimeStill/sql-migrator/tree/main/src/App/Schema) entity models. In addition to the `OriginKey`, these models should also specify maps to foreign key IDs in the origin schema. A good example of this is the [`ContactInfo`](https://github.com/JaimeStill/sql-migrator/blob/main/src/Core/Schema/AdventureWorks/ContactInfo.cs) model:
 
 ```cs title="ContactInfo.cs"
 using AppContactInfo = App.Schema.ContactInfo;
@@ -41,12 +41,12 @@ using AppContactInfo = App.Schema.ContactInfo;
 namespace Core.Schema.AdventureWorks;
 public class ContactInfo : AppContactInfo, IMigrationTarget
 {
-    public string SourceId => $"{SourceEmployeeId}.{ContactType}.{Value}";
-    public string SourceEmployeeId { get; set; } = string.Empty;
+    public string OriginKey => $"{OriginEmployeeKey}.{ContactType}.{Value}";
+    public string OriginEmployeeId { get; set; } = string.Empty;
 }
 ```
 
-The `Id` and `Type` properties required by `IMigrationTarget` are already specified by [`App.Schema.ContactInfo`](https://github.com/JaimeStill/sql-migrator/blob/main/src/App/Schema/ContactInfo.cs) through its [`Entity`](https://github.com/JaimeStill/sql-migrator/blob/main/src/App/Schema/Entity.cs) base class. It simply needs to define the `SourceId` and any metadata needed during the migration process; in this case, `SourceEmployeeId` which maps the origin foreign key ID of the related `Employee` record.
+The `Id` and `Type` properties required by `IMigrationTarget` are already specified by [`App.Schema.ContactInfo`](https://github.com/JaimeStill/sql-migrator/blob/main/src/App/Schema/ContactInfo.cs) through its [`Entity`](https://github.com/JaimeStill/sql-migrator/blob/main/src/App/Schema/Entity.cs) base class. It simply needs to define the `OriginKey` and any metadata needed during the migration process; in this case, `OriginEmployeeKey` which maps the origin foreign key ID of the related `Employee` record.
 
 ## Connector
 
@@ -131,12 +131,12 @@ Any class that derives from `Translator` must define:
 
 * [`T ToV1Null()`](https://github.com/JaimeStill/sql-migrator/blob/main/src/Core/Sql/Translator.cs#L23) - how the data should be formatted to facilitate a missing dependency
 * [`string[] InsertProps`](https://github.com/JaimeStill/sql-migrator/blob/main/src/Core/Sql/Translator.cs#L24) - the properties to include in the `INSERT` query
-* [`Task<T?> GetByKey(string key)`](https://github.com/JaimeStill/sql-migrator/blob/main/src/Core/Sql/Translator.cs#L25) - how to select a single record from the origin database given its `SourceId`
+* [`Task<T?> GetByKey(string key)`](https://github.com/JaimeStill/sql-migrator/blob/main/src/Core/Sql/Translator.cs#L25) - how to select a single record from the origin database given its `OriginKey`
 * [`Task<List<T>> Get()`](https://github.com/JaimeStill/sql-migrator/blob/main/src/Core/Sql/Translator.cs#L26) - how to retrieve all data translated to the target type
 
 The [`Task List<T>> Migrate()`](https://github.com/JaimeStill/sql-migrator/blob/main/src/Core/Sql/Translator.cs#L28) method performs the migration simply by retreiving the data with `Get()` and passing the results to [`InsertMany(List<T> data)`](https://github.com/JaimeStill/sql-migrator/blob/main/src/Core/Sql/Translator.cs#L74).
 
-A Translator that represents a model with one or more dependencies on other models can initialize the Translators. It can then ensure the foreign keys for the dependent models are initialized by overriding [`Func<T, Task<T>>? OnMigrate`](https://github.com/JaimeStill/sql-migrator/blob/main/src/Core/Sql/Translator.cs#L21) and calling the [`Task<int> EnsureMigrated(string key)`](https://github.com/JaimeStill/sql-migrator/blob/main/src/Core/Sql/Translator.cs#L94) method, where `key` is the `SourceId` from the origin database for the dependent data.
+A Translator that represents a model with one or more dependencies on other models can initialize the Translators. It can then ensure the foreign keys for the dependent models are initialized by overriding [`Func<T, Task<T>>? OnMigrate`](https://github.com/JaimeStill/sql-migrator/blob/main/src/Core/Sql/Translator.cs#L21) and calling the [`Task<int> EnsureMigrated(string key)`](https://github.com/JaimeStill/sql-migrator/blob/main/src/Core/Sql/Translator.cs#L94) method, where `key` is the `OriginKey` from the origin database for the dependent data.
 
 ### Derived Translators
 

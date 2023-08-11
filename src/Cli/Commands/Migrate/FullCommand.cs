@@ -1,3 +1,4 @@
+using Cli.Seeders;
 using Cli.Translators;
 
 namespace Cli.Commands;
@@ -5,7 +6,7 @@ public class FullCommand : CliCommand
 {
     public FullCommand() : base(
         "full",
-        "Migrate V1 data to V2",
+        "Migrate origin schema data to target schema",
         new Func<string, string, string, Task>(Call)
     )
     { }
@@ -22,30 +23,35 @@ public class FullCommand : CliCommand
         Console.WriteLine($"{data.Count} {entity} records successfully migrated!");
     }
 
-    static async Task Call(string v1, string v2, string migrator)
+    static async Task Call(string origin, string target, string migrator)
     {
-        ConsoleColor origin = Console.ForegroundColor;
+        ConsoleColor color = Console.ForegroundColor;
 
         try
         {
             await Migrate(
+                "Company",
+                async () => await new CompanySeeder(target, migrator).Migrate()
+            );
+
+            await Migrate(
                 "Department",
-                async () => await new DepartmentTranslator(v1, v2, migrator).Migrate()
+                async () => await new DepartmentTranslator(origin, target, migrator).Migrate()
             );
 
             await Migrate(
                 "Employee",
-                async () => await new EmployeeTranslator(v1, v2, migrator).Migrate()
+                async () => await new EmployeeTranslator(origin, target, migrator).Migrate()
             );
 
             await Migrate(
                 "ContactInfo",
-                async () => await new ContactInfoTranslator(v1, v2, migrator).Migrate()
+                async () => await new ContactInfoTranslator(origin, target, migrator).Migrate()
             );
         }
         finally
         {
-            Console.ForegroundColor = origin;
+            Console.ForegroundColor = color;
         }
     }
 }

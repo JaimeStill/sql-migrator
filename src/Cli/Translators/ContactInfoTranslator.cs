@@ -12,7 +12,6 @@ public class ContactInfoTranslator : Translator<ContactInfo>
         string target = "target",
         string migrator = "migration"
     ) : base(
-        typeof(ContactInfo).Name,
         source,
         target,
         migrator
@@ -23,7 +22,7 @@ public class ContactInfoTranslator : Translator<ContactInfo>
 
     protected override Func<ContactInfo, Task<ContactInfo>>? OnMigrate => async (info) =>
     {
-        info.EmployeeId = await employeeTranslator.EnsureMigrated(info.SourceEmployeeId);
+        info.EmployeeId = await employeeTranslator.EnsureMigrated(info.OriginEmployeeKey);
         return info;
     };
 
@@ -36,14 +35,14 @@ public class ContactInfoTranslator : Translator<ContactInfo>
 
     protected override ContactInfo ToV1Null() => new()
     {
-        SourceEmployeeId = "V1Null",
+        OriginEmployeeKey = "V1Null",
         Value = "V1Null",
         ContactType = "V1Null"
     };
 
     protected static string[] GetPhoneQuery() => new string[] {
         "SELECT",
-        "  CAST([person].[BusinessEntityID] as nvarchar(MAX)) [SourceEmployeeId],",
+        "  CAST([person].[BusinessEntityID] as nvarchar(MAX)) [OriginEmployeeKey],",
         "  CAST([phone].[PhoneNumber] as nvarchar(MAX)) [Value],",
         "  CAST([phoneType].[Name] as nvarchar(MAX)) [ContactType]",
         "FROM [Person].[Person] [person]",
@@ -56,7 +55,7 @@ public class ContactInfoTranslator : Translator<ContactInfo>
 
     protected static string[] GetEmailQuery() => new string[] {
         "SELECT",
-        "  CAST([person].[BusinessEntityID] as nvarchar(MAX)) [SourceEmployeeId],",
+        "  CAST([person].[BusinessEntityID] as nvarchar(MAX)) [OriginEmployeeKey],",
         "  CAST([email].[EmailAddress] as nvarchar(MAX)) [Value],",
         "  CAST('Email' as nvarchar(MAX)) [ContactType]",
         "FROM [Person].[Person] [person]",

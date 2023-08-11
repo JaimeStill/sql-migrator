@@ -17,6 +17,8 @@ public class Employee : Entity
     public Department? Department { get; set; }
 
     public ICollection<ContactInfo> ContactInfo { get; } = new List<ContactInfo>();
+    public ICollection<Message> Inbox { get; } = new List<Message>();
+    public ICollection<Message> Outbox { get; } = new List<Message>();
 
     public override Task<ValidationResult> Validate()
     {
